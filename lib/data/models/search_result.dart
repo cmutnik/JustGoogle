@@ -1,3 +1,5 @@
+import 'image_metadata.dart';
+
 /// Model for a single search result item
 class SearchResult {
   final String title;
@@ -6,6 +8,7 @@ class SearchResult {
   final String? displayLink;
   final String? formattedUrl;
   final Map<String, dynamic>? pagemap;
+  final ImageMetadata? image;
 
   const SearchResult({
     required this.title,
@@ -14,6 +17,7 @@ class SearchResult {
     this.displayLink,
     this.formattedUrl,
     this.pagemap,
+    this.image,
   });
 
   /// Create SearchResult from JSON
@@ -25,6 +29,9 @@ class SearchResult {
       displayLink: json['displayLink'] as String?,
       formattedUrl: json['formattedUrl'] as String?,
       pagemap: json['pagemap'] as Map<String, dynamic>?,
+      image: json['image'] != null
+          ? ImageMetadata.fromJson(json['image'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -37,8 +44,18 @@ class SearchResult {
       if (displayLink != null) 'displayLink': displayLink,
       if (formattedUrl != null) 'formattedUrl': formattedUrl,
       if (pagemap != null) 'pagemap': pagemap,
+      if (image != null) 'image': image!.toJson(),
     };
   }
+
+  /// Check if this is an image result
+  bool get isImageResult => image != null;
+
+  /// Get thumbnail URL for image results
+  String? get thumbnailUrl => image?.thumbnailLink;
+
+  /// Get image context URL (page containing the image)
+  String? get imageContextUrl => image?.contextLink;
 
   /// Get favicon URL from pagemap
   String? get faviconUrl {
@@ -79,7 +96,8 @@ class SearchResult {
         other.link == link &&
         other.snippet == snippet &&
         other.displayLink == displayLink &&
-        other.formattedUrl == formattedUrl;
+        other.formattedUrl == formattedUrl &&
+        other.image == image;
   }
 
   @override
@@ -90,6 +108,7 @@ class SearchResult {
       snippet,
       displayLink,
       formattedUrl,
+      image,
     );
   }
 }

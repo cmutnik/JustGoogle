@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../core/constants/api_constants.dart';
+import '../../../core/constants/search_types.dart';
 
 /// API client for Google Custom Search
 class SearchApiClient {
@@ -46,6 +47,7 @@ class SearchApiClient {
   /// - [query]: The search query string (required)
   /// - [startIndex]: The index of the first result to return (1-indexed, default: 1)
   /// - [num]: Number of results to return (1-10, default: 10)
+  /// - [searchType]: Type of search (web or image, default: web)
   /// - [dateRestrict]: Restricts results based on date (e.g., 'd1' for past day, 'w1' for past week)
   /// - [siteSearch]: Restricts results to URLs from a specific site
   /// - [fileType]: Restricts results to files of a specified type
@@ -60,6 +62,7 @@ class SearchApiClient {
     required String query,
     int startIndex = 1,
     int num = ApiConstants.defaultResultsPerPage,
+    SearchType searchType = SearchType.web,
     String? dateRestrict,
     String? siteSearch,
     String? fileType,
@@ -100,6 +103,11 @@ class SearchApiClient {
         'start': startIndex,
         'num': num,
       };
+
+      // Add searchType parameter if image search
+      if (searchType == SearchType.image) {
+        queryParameters['searchType'] = 'image';
+      }
 
       // Add optional parameters if provided
       if (dateRestrict != null && dateRestrict.isNotEmpty) {

@@ -20,6 +20,7 @@ class SearchRepositoryImpl implements SearchRepository {
         query: request.query,
         startIndex: request.startIndex,
         num: request.numResults,
+        searchType: request.searchType,
         dateRestrict: request.dateRestrict,
         siteSearch: request.siteSearch,
         fileType: request.fileType,
@@ -112,6 +113,11 @@ class SearchRepositoryImpl implements SearchRepository {
       domain: result.domain,
       displayUrl: result.formattedUrl ?? result.displayLink,
       faviconUrl: result.faviconUrl,
+      thumbnailUrl: result.image?.thumbnailLink,
+      imageContextUrl: result.image?.contextLink,
+      imageWidth: result.image?.width,
+      imageHeight: result.image?.height,
+      isImageResult: result.isImageResult,
     );
   }
 }

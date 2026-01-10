@@ -9,6 +9,11 @@ class SearchItem {
   final String domain;
   final String? displayUrl;
   final String? faviconUrl;
+  final String? thumbnailUrl;
+  final String? imageContextUrl;
+  final int? imageWidth;
+  final int? imageHeight;
+  final bool isImageResult;
 
   const SearchItem({
     required this.title,
@@ -17,6 +22,11 @@ class SearchItem {
     required this.domain,
     this.displayUrl,
     this.faviconUrl,
+    this.thumbnailUrl,
+    this.imageContextUrl,
+    this.imageWidth,
+    this.imageHeight,
+    this.isImageResult = false,
   });
 
   /// Create a copy with updated fields
@@ -27,6 +37,11 @@ class SearchItem {
     String? domain,
     String? displayUrl,
     String? faviconUrl,
+    String? thumbnailUrl,
+    String? imageContextUrl,
+    int? imageWidth,
+    int? imageHeight,
+    bool? isImageResult,
   }) {
     return SearchItem(
       title: title ?? this.title,
@@ -35,6 +50,11 @@ class SearchItem {
       domain: domain ?? this.domain,
       displayUrl: displayUrl ?? this.displayUrl,
       faviconUrl: faviconUrl ?? this.faviconUrl,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      imageContextUrl: imageContextUrl ?? this.imageContextUrl,
+      imageWidth: imageWidth ?? this.imageWidth,
+      imageHeight: imageHeight ?? this.imageHeight,
+      isImageResult: isImageResult ?? this.isImageResult,
     );
   }
 
@@ -53,7 +73,12 @@ class SearchItem {
         other.snippet == snippet &&
         other.domain == domain &&
         other.displayUrl == displayUrl &&
-        other.faviconUrl == faviconUrl;
+        other.faviconUrl == faviconUrl &&
+        other.thumbnailUrl == thumbnailUrl &&
+        other.imageContextUrl == imageContextUrl &&
+        other.imageWidth == imageWidth &&
+        other.imageHeight == imageHeight &&
+        other.isImageResult == isImageResult;
   }
 
   @override
@@ -65,6 +90,11 @@ class SearchItem {
       domain,
       displayUrl,
       faviconUrl,
+      thumbnailUrl,
+      imageContextUrl,
+      imageWidth,
+      imageHeight,
+      isImageResult,
     );
   }
 }

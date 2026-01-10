@@ -1,8 +1,11 @@
+import '../../core/constants/search_types.dart';
+
 /// Model for search request parameters
 class SearchRequest {
   final String query;
   final int startIndex;
   final int numResults;
+  final SearchType searchType;
   final String? dateRestrict;
   final String? siteSearch;
   final String? fileType;
@@ -15,6 +18,7 @@ class SearchRequest {
     required this.query,
     this.startIndex = 1,
     this.numResults = 10,
+    this.searchType = SearchType.web,
     this.dateRestrict,
     this.siteSearch,
     this.fileType,
@@ -29,6 +33,7 @@ class SearchRequest {
     String? query,
     int? startIndex,
     int? numResults,
+    SearchType? searchType,
     String? dateRestrict,
     String? siteSearch,
     String? fileType,
@@ -41,6 +46,7 @@ class SearchRequest {
       query: query ?? this.query,
       startIndex: startIndex ?? this.startIndex,
       numResults: numResults ?? this.numResults,
+      searchType: searchType ?? this.searchType,
       dateRestrict: dateRestrict ?? this.dateRestrict,
       siteSearch: siteSearch ?? this.siteSearch,
       fileType: fileType ?? this.fileType,
@@ -53,7 +59,7 @@ class SearchRequest {
 
   @override
   String toString() {
-    return 'SearchRequest(query: $query, startIndex: $startIndex, numResults: $numResults)';
+    return 'SearchRequest(query: $query, startIndex: $startIndex, numResults: $numResults, searchType: $searchType)';
   }
 
   @override
@@ -64,6 +70,7 @@ class SearchRequest {
         other.query == query &&
         other.startIndex == startIndex &&
         other.numResults == numResults &&
+        other.searchType == searchType &&
         other.dateRestrict == dateRestrict &&
         other.siteSearch == siteSearch &&
         other.fileType == fileType &&
@@ -79,6 +86,7 @@ class SearchRequest {
       query,
       startIndex,
       numResults,
+      searchType,
       dateRestrict,
       siteSearch,
       fileType,
