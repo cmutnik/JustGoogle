@@ -1,79 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#1a73e8" />
-  <meta name="description" content="JustGoogle is a simple search engine with no AI and no clutter." />
-  <title>JustGoogle</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="assets/logos/justgoogle_logo.png" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimpleSearch</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#202124">
+    <style>
+        body { font-family: sans-serif; background: #202124; color: #e8eaed; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .search-box { width: 100%; padding: 12px; border-radius: 24px; border: 1px solid #5f6368; background: #303134; color: white; font-size: 16px; outline: none; }
+        .result { margin-top: 20px; padding: 15px; border-bottom: 1px solid #3c4043; }
+        .result a { color: #8ab4f8; text-decoration: none; font-size: 18px; }
+        .result .url { color: #9aa0a6; font-size: 12px; display: block; margin-bottom: 5px; }
+        .result p { color: #bdc1c6; font-size: 14px; margin: 5px 0 0; }
+        .offline-tag { color: #f28b82; font-size: 12px; font-weight: bold; }
+    </style>
 </head>
 <body>
-  <main class="app">
-    <section class="hero">
-      <img src="assets/logos/justgoogle_logo.png" alt="JustGoogle logo" class="logo" />
-      <form id="search-form" class="search-form" autocomplete="off">
-        <label for="query" class="sr-only">Search the web</label>
-        <div class="search-input">
-          <span class="search-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation">
-              <path d="M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 14 15.5l.3.3v.8L20 21.5 21.5 20l-6-6zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"></path>
-            </svg>
-          </span>
-          <input
-            id="query"
-            name="query"
-            type="search"
-            placeholder="Search the web"
-            required
-            inputmode="search"
-            autocomplete="off"
-          />
-        </div>
-        <div class="search-actions">
-          <button type="submit" class="btn">Google Search</button>
-          <button type="button" id="lucky-button" class="btn ghost">I'm Feeling Lucky</button>
-        </div>
-      </form>
-      <div class="meta-row">
-        <span id="status" class="status" aria-live="polite">Ready when you are.</span>
-        <a id="open-external" class="open-external" href="https://duckduckgo.com" target="_blank" rel="noopener">Open in DuckDuckGo</a>
-      </div>
-    </section>
-
-    <section class="results-section">
-      <div class="results-meta">
-        <span id="results-count" class="results-count">0 results</span>
-        <span class="results-note">Instant answers and related topics.</span>
-      </div>
-      <div id="offline-banner" class="offline-banner" role="status" aria-live="polite" hidden>
-        Offline mode. Showing cached results when available.
-      </div>
-      <div id="results" class="results-list"></div>
-      <div id="empty-state" class="empty-state" hidden>
-        <h3 id="empty-title">No results yet.</h3>
-        <p id="empty-message">Try a broader query or open the full search page.</p>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <span>Powered by the DuckDuckGo Instant Answer API.</span>
-      <span>Install this app for offline-ready searching.</span>
-    </footer>
-  </main>
-
-  <noscript>
-    <div class="noscript">
-      JavaScript is required to run search queries.
+    <div class="container">
+        <input type="text" id="search" class="search-box" placeholder="Search with DuckDuckGo..." autofocus>
+        <div id="results"></div>
     </div>
-  </noscript>
 
-  <script src="app.js"></script>
+    <script>
+        const searchInput = document.getElementById('search');
+        const resultsDiv = document.getElementById('results');
+
+        // Load cached results if offline
+        window.addEventListener('load', () => {
+            const lastSearch = localStorage.getItem('lastResults');
+            if (lastSearch && !navigator.onLine) {
+                renderResults(JSON.parse(lastSearch), true);
+            }
+        });
+
+        searchInput.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value;
+                resultsDiv.innerHTML = 'Searching...';
+                
+                try {
+                    const res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&no_html=1`);
+                    const data = await res.json();
+                    
+                    // Format results into a list
+                    const results = [];
+                    if (data.AbstractURL) {
+                        results.push({ title: data.Heading, url: data.AbstractURL, snippet: data.AbstractText });
+                    }
+                    data.RelatedTopics.forEach(topic => {
+                        if (topic.Text && topic.FirstURL) {
+                            results.push({ title: topic.Text.split(' - ')[0], url: topic.FirstURL, snippet: topic.Text });
+                        }
+                    });
+
+                    localStorage.setItem('lastResults', JSON.stringify(results));
+                    renderResults(results);
+                } catch (err) {
+                    resultsDiv.innerHTML = 'Error fetching results. Check your connection.';
+                }
+            }
+        });
+
+        function renderResults(results, isOffline = false) {
+            resultsDiv.innerHTML = isOffline ? '<p class="offline-tag">Showing cached results (Offline)</p>' : '';
+            if (results.length === 0) resultsDiv.innerHTML += 'No simple results found. Try another query.';
+            results.forEach(r => {
+                resultsDiv.innerHTML += `
+                    <div class="result">
+                        <span class="url">${r.url}</span>
+                        <a href="${r.url}" target="_blank">${r.title}</a>
+                        <p>${r.snippet}</p>
+                    </div>`;
+            });
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
